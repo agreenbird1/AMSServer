@@ -1,3 +1,4 @@
+import { BusinessException } from './../common/exceptions/business.exception';
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -9,6 +10,10 @@ export class UserService {
   }
 
   findAll() {
+    throw new BusinessException({
+      code: 400,
+      message: '参数错误',
+    });
     return `This action returns all user`;
   }
 
