@@ -4,9 +4,11 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
 import { AllExceptionsFilter } from './common/exceptions/base.exception.filter';
 import { HttpExceptionFilter } from './common/exceptions/http.exception.filter';
 import { generateDocument } from './doc';
+import * as session from 'express-session';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
+  app.use(session({ secret: 'tqt_ams_server', name: 'tqt_ams_server' }));
   // 全局返回格式
   app.useGlobalInterceptors(new TransformInterceptor());
   // 异常过滤器
