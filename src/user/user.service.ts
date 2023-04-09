@@ -28,4 +28,9 @@ export class UserService {
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
+
+  login(body: any) {
+    console.log(body);
+    return 'this is login api!';
+  }
 }
