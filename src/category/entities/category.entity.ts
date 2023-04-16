@@ -26,6 +26,7 @@ export class Category {
   })
   type: 1 | 2; // 1: 资产分类 2：部门分类
 
-  @TreeParent()
+  // 级联删除
+  @TreeParent({ onDelete: 'CASCADE' })
   parent: Category;
 }
