@@ -17,13 +17,12 @@ export class UserController {
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    console.log(createUserDto);
     return this.userService.create(createUserDto);
   }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
+  @Post('list')
+  findAll(@Body() searchUserDto: any) {
+    return this.userService.findAll(searchUserDto);
   }
 
   @Get(':id')
