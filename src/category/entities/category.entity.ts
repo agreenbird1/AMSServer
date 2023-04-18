@@ -1,3 +1,4 @@
+import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
   Tree,
@@ -5,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   TreeChildren,
   TreeParent,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -29,4 +31,7 @@ export class Category {
   // 级联删除
   @TreeParent({ onDelete: 'CASCADE' })
   parent: Category;
+
+  @OneToMany(() => User, (User) => User.category)
+  users: User[];
 }
