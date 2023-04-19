@@ -44,4 +44,19 @@ export class UserController {
   login(@Body() body) {
     return this.userService.login(body);
   }
+
+  @Post('status')
+  changeStatus(@Body() body) {
+    return this.userService.changeStatus(body);
+  }
+
+  @Post('role')
+  changeRole(@Body() body) {
+    return this.userService.changeRole(body);
+  }
+
+  @Post('check')
+  checkRepeatAccount(@Body() body) {
+    return this.userService.checkRepeatAccount(body);
+  }
 }

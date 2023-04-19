@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { CategoryService } from 'src/category/category.service';
 import { SearchUserDto } from './dto/search-user.dto';
+import { BusinessException } from 'src/common/exceptions/business.exception';
 
 @Injectable()
 export class UserService {
@@ -17,8 +18,10 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const user = new User();
     user.userName = createUserDto.userName;
-    user.avatar = createUserDto.avatar;
-    user.description = createUserDto.description;
+    user.description = createUserDto.description || '';
+    user.avatar =
+      createUserDto.avatar ||
+      'https://img.juexiaotime.com/adminFile_operation_production/20230419/1111112746/20230419222007_ns77.jpg';
     user.password = createUserDto.password;
     user.phone = createUserDto.phone;
     user.category = await this.categoryService.findOne(
@@ -55,15 +58,31 @@ export class UserService {
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    return this.user.update(id, updateUserDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    return this.user.delete(id);
   }
 
-  login(body: any) {
-    console.log(body);
-    return 'this is login api!';
+  async login(body: { phone: string; password: string }) {
+    const { phone, password } = body;
+    if (!(await this.user.findOneBy({ phone })))
+      throw new BusinessException('账号不存在！');
+    if (!(await this.user.findOneBy({ phone, password })))
+      throw new BusinessException('密码错误！');
+    return this.user.findOneBy({ phone, password });
+  }
+
+  changeStatus(body: { id: number; status: 0 | 1 }) {
+    return this.update(body.id, { status: body.status });
+  }
+
+  changeRole(body: { id: number; role: 1 | 2 }) {
+    return this.update(body.id, { role: body.role });
+  }
+
+  checkRepeatAccount(body: { phone: string }) {
+    return !!this.user.findOneBy(body);
   }
 }
