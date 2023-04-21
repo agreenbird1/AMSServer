@@ -4,6 +4,7 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
@@ -19,8 +20,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: request.url,
       status: HttpStatus.SERVICE_UNAVAILABLE,
-      data: exception.message,
-      message: 'fail',
+      message: new ServiceUnavailableException().getResponse(),
     });
   }
 }
