@@ -1,7 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { AssetService } from './asset.service';
 import { CreateAssetDto } from './dto/create-asset.dto';
 import { UpdateAssetDto } from './dto/update-asset.dto';
+import { SearchAssetDto } from './dto/search-asset.dto';
 
 @Controller('asset')
 export class AssetController {
@@ -12,11 +21,10 @@ export class AssetController {
     return this.assetService.create(createAssetDto);
   }
 
-  @Get()
-  findAll() {
-    return this.assetService.findAll();
+  @Post('list')
+  findAll(@Body() searchAssetDto: any) {
+    return this.assetService.findAll(searchAssetDto);
   }
-
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.assetService.findOne(+id);

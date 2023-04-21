@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   Generated,
   ManyToOne,
+  CreateDateColumn,
 } from 'typeorm';
 import { Category } from '../../category/entities/category.entity';
 
@@ -16,16 +17,29 @@ export class Asset {
   name: string;
 
   @Column({ type: 'double' })
-  price: number;
+  amount: number;
 
   @Column({ type: 'int' })
   quantity: number;
 
-  @Column({ type: 'timestamp' })
+  @CreateDateColumn()
   purchaseTime: Date;
 
   @Column()
   specification: string; // 规格型号
+
+  @Column()
+  picture: string;
+
+  @Column()
+  location: string;
+
+  @Column({
+    type: 'enum',
+    enum: [0 | 1],
+    default: 1,
+  })
+  status: 0 | 1;
 
   @Generated('uuid')
   serialNumber: string;
