@@ -3,6 +3,7 @@ import {
   Catch,
   ArgumentsHost,
   HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
@@ -14,11 +15,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     // 非 HTTP 标准异常的处理。
-    const status = exception.getStatus();
-    response.status(status).send({
-      status,
+    response.status(HttpStatus.SERVICE_UNAVAILABLE).send({
       timestamp: new Date().toISOString(),
       path: request.url,
+      status: HttpStatus.SERVICE_UNAVAILABLE,
       data: exception.message,
       message: 'fail',
     });
