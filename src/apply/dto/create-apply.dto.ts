@@ -1,4 +1,7 @@
+import { IsArray } from 'class-validator';
+
 export class CreateApplyDto {
   userId: number;
-  assetId: number;
+  @IsArray()
+  assetIds: number[];
 }

@@ -24,13 +24,18 @@ export class ApplyController {
     return this.applyService.findAll(query);
   }
 
+  @Get('approval')
+  findApprovalAll(@Query() query) {
+    return this.applyService.findApprovalAll(query);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.applyService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBody) {
+  update(@Param('id') id: number, @Body() updateBody) {
     return this.applyService.update(id, updateBody);
   }
 }

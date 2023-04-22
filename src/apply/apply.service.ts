@@ -10,31 +10,69 @@ import { Apply } from './entities/apply.entity';
 export class ApplyService {
   constructor(
     @InjectRepository(Apply) private readonly apply: Repository<Apply>,
-    @InjectRepository(User) private readonly user: Repository<User>,
-    @InjectRepository(Asset) private readonly asset: Repository<Asset>,
   ) {}
 
   async create(createApplyDto: CreateApplyDto) {
-    const apply = new Apply();
-    apply.user = await this.user.findOneBy({ id: createApplyDto.userId });
-    apply.asset = await this.asset.findOneBy({ id: createApplyDto.assetId });
-    return this.apply.save(apply);
+    const user = await this.apply.manager
+      .getRepository(User)
+      .findOneBy({ id: createApplyDto.userId });
+    for (let index = 0; index < createApplyDto.assetIds.length; index++) {
+      const assetId = createApplyDto.assetIds[index];
+      const apply = new Apply();
+      apply.user = user;
+      apply.asset = await this.apply.manager
+        .getRepository(Asset)
+        .findOneBy({ id: assetId });
+      // 申请这个物品后数量减一
+      this.apply.manager.getRepository(Asset).update(apply.asset.id, {
+        quantity: apply.asset.quantity - 1,
+      });
+      this.apply.save(apply);
+    }
+    return 'success';
   }
 
-  async findAll(query: {
-    userId: number;
-    status: number;
-    pageNum: number;
-    pageSize: number;
-  }) {
+  async findAll(query: { userId: number; status: number; pageNum: number }) {
     let qb = this.apply.createQueryBuilder('apply');
     qb = qb
       .where('apply.userId = :userId and apply.status = :status', query)
-      .skip(query.pageSize * (query.pageNum - 1))
-      .take(query.pageSize);
+      .leftJoinAndSelect('apply.user', 'user')
+      .leftJoinAndSelect('apply.asset', 'asset')
+      .skip(10 * (query.pageNum - 1))
+      .take(10);
 
     const data = await qb.getManyAndCount();
 
+    return {
+      total: data[1],
+      list: data[0],
+    };
+  }
+
+  async findApprovalAll(query: {
+    status: number;
+    pageNum: number;
+    approveUserId: number;
+  }) {
+    let qb = this.apply.createQueryBuilder('apply');
+    if (query.status == 1) qb = qb.where('apply.status = :status', query);
+    else
+      qb = qb.where(
+        'apply.status != :status and apply.approveUserId = :approveUserId',
+        {
+          status: 1,
+          approveUserId: query.approveUserId,
+        },
+      );
+
+    qb = qb
+      .leftJoinAndSelect('apply.user', 'user')
+      .leftJoinAndSelect('apply.asset', 'asset')
+      .leftJoinAndSelect('apply.approveUser', 'approveUser')
+      .skip(10 * (query.pageNum - 1))
+      .take(10);
+
+    const data = await qb.getManyAndCount();
     return {
       total: data[1],
       list: data[0],
@@ -45,7 +83,20 @@ export class ApplyService {
     return `This action returns a #${id} apply`;
   }
 
-  update(id: string, updateBody) {
-    return this.apply.update(id, updateBody);
+  async update(id: number, updateBody) {
+    const apply = await this.apply.findOneBy({ id });
+    console.log('apply', apply);
+    console.log('updateBody', updateBody);
+    if (updateBody.approveUserId) {
+      apply.approveUser = await this.apply.manager
+        .getRepository(User)
+        .findOneBy({ id: updateBody.approveUserId });
+      delete updateBody.approveUserId;
+    }
+
+    return this.apply.update(id, {
+      ...apply,
+      ...updateBody,
+    });
   }
 }

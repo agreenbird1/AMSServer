@@ -5,16 +5,13 @@ import {
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
-  OneToOne,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity()
 export class Apply {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @OneToOne(() => User)
-  approveUser: User;
 
   @Column({
     type: 'enum',
@@ -26,18 +23,21 @@ export class Apply {
   @CreateDateColumn()
   applyTime: Date;
 
-  @Column({ type: 'date' })
-  approveTime: Date;
+  @Column({ nullable: true })
+  approveTime: string;
 
-  @Column()
+  @Column({ nullable: true })
   rejectReason: string;
 
-  @Column()
+  @Column({ nullable: true })
   remark: string;
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User)
   user: User;
 
-  @OneToOne(() => Asset)
+  @ManyToOne(() => Asset)
   asset: Asset;
+
+  @ManyToOne(() => User)
+  approveUser: User;
 }
