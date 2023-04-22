@@ -41,8 +41,15 @@ export class Asset {
   })
   status: 0 | 1;
 
+  @Column()
   @Generated('uuid')
   serialNumber: string;
+
+  @Column({ type: 'double' })
+  currentValue: number;
+
+  @Column({ type: 'double' })
+  depreciationValue: number;
 
   @ManyToOne(() => Category)
   category: Category;

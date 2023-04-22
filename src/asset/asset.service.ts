@@ -27,6 +27,8 @@ export class AssetService {
     asset.category = await this.categoryService.findOne(
       createAssetDto.categoryId,
     );
+    asset.depreciationValue = asset.currentValue =
+      asset.amount * asset.quantity;
     return this.asset.manager.save(asset);
   }
 
