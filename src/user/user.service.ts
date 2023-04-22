@@ -80,6 +80,8 @@ export class UserService {
         password,
       },
     });
+    if (users[0].status == 0)
+      throw new BusinessException('账号已被停用！请联系管理员解决！');
     return users[0];
   }
 
