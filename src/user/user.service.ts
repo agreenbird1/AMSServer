@@ -71,7 +71,16 @@ export class UserService {
       throw new BusinessException('账号不存在！');
     if (!(await this.user.findOneBy({ phone, password })))
       throw new BusinessException('密码错误！');
-    return this.user.findOneBy({ phone, password });
+    const users = await this.user.find({
+      relations: {
+        category: true,
+      },
+      where: {
+        phone,
+        password,
+      },
+    });
+    return users[0];
   }
 
   changeStatus(body: { id: number; status: 0 | 1 }) {
