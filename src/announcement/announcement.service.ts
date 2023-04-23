@@ -17,6 +17,6 @@ export class AnnouncementService {
 
   async findOne() {
     const announcements = await this.announcement.find();
-    return announcements[0];
+    return announcements.at(-1) || {};
   }
 }
