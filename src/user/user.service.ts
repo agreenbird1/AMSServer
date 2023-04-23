@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Request } from 'express';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -65,7 +66,7 @@ export class UserService {
     return this.user.delete(id);
   }
 
-  async login(body: { phone: string; password: string }) {
+  async login(body: { phone: string; password: string }, req: Request) {
     const { phone, password } = body;
     if (!(await this.user.findOneBy({ phone })))
       throw new BusinessException('账号不存在！');
@@ -82,6 +83,8 @@ export class UserService {
     });
     if (users[0].status == 0)
       throw new BusinessException('账号已被停用！请联系管理员解决！');
+    (req.session as any).userId = users[0].id;
+    (req.session as any).role = users[0].role;
     return users[0];
   }
 
