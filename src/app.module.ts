@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AssetModule } from './asset/asset.module';
 import { CategoryModule } from './category/category.module';
 import { ApplyModule } from './apply/apply.module';
+import { AnnouncementModule } from './announcement/announcement.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ApplyModule } from './apply/apply.module';
     AssetModule,
     CategoryModule,
     ApplyModule,
+    AnnouncementModule,
   ],
   controllers: [AppController],
   providers: [AppService],
