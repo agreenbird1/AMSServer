@@ -51,6 +51,18 @@ export class Asset {
   @Column({ type: 'double' })
   depreciationValue: number;
 
+  @Column({ type: 'int', default: 0 })
+  maintenanceNumber: number;
+
+  @Column({ type: 'double', default: 0 })
+  maintenanceValue: number;
+
+  @Column({ type: 'int', default: 0 })
+  scrapNumber: number;
+
+  @Column({ type: 'double', default: 0 })
+  scrapValue: number;
+
   @ManyToOne(() => Category)
   category: Category;
 }
