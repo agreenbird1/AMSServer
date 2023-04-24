@@ -27,6 +27,9 @@ export class Apply {
   approveTime: string;
 
   @Column({ nullable: true })
+  signTime: string;
+
+  @Column({ nullable: true })
   rejectReason: string;
 
   @Column({ nullable: true })
