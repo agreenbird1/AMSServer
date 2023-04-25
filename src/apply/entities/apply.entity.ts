@@ -20,6 +20,13 @@ export class Apply {
   })
   status: 1 | 2 | 3 | 4 | 5; // 审批中、已批准、已驳回、待签收、已签收
 
+  @Column({
+    type: 'enum',
+    enum: [1, 2, 3],
+    nullable: true,
+  })
+  myStatus: 1 | 2 | 3; // 正常使用、维修中、退还中
+
   @CreateDateColumn()
   applyTime: Date;
 

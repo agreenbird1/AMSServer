@@ -25,10 +25,10 @@ export class ApplyService {
         .getRepository(Asset)
         .findOneBy({ id: assetId });
       // 申请这个物品后数量减一
-      this.apply.manager.getRepository(Asset).update(apply.asset.id, {
+      await this.apply.manager.getRepository(Asset).update(apply.asset.id, {
         quantity: apply.asset.quantity - 1,
       });
-      this.apply.save(apply);
+      await this.apply.save(apply);
     }
     return 'success';
   }
@@ -39,6 +39,29 @@ export class ApplyService {
       .where('apply.userId = :userId and apply.status = :status', query)
       .leftJoinAndSelect('apply.user', 'user')
       .leftJoinAndSelect('apply.asset', 'asset')
+      .leftJoinAndSelect('apply.approveUser', 'approveUser')
+      .skip(10 * (query.pageNum - 1))
+      .take(10);
+
+    const data = await qb.getManyAndCount();
+
+    return {
+      total: data[1],
+      list: data[0],
+    };
+  }
+
+  async findMyAssetsAll(query: {
+    userId: number;
+    myStatus: number;
+    pageNum: number;
+  }) {
+    let qb = this.apply.createQueryBuilder('apply');
+    qb = qb
+      .where('apply.userId = :userId and apply.myStatus = :myStatus', query)
+      .leftJoinAndSelect('apply.user', 'user')
+      .leftJoinAndSelect('apply.asset', 'asset')
+      .leftJoinAndSelect('apply.approveUser', 'approveUser')
       .skip(10 * (query.pageNum - 1))
       .take(10);
 
@@ -85,23 +108,28 @@ export class ApplyService {
   }
 
   async update(id: number, updateBody) {
-    const apply = await this.apply.findOneBy({ id });
-    console.log('apply', apply);
-    console.log('updateBody', updateBody);
-
+    const apply = await this.apply
+      .createQueryBuilder('apply')
+      .leftJoinAndSelect('apply.user', 'user')
+      .leftJoinAndSelect('apply.asset', 'asset')
+      .leftJoinAndSelect('apply.approveUser', 'approveUser')
+      .where('apply.id = :id', { id })
+      .getOne();
     if (updateBody.approveUserId) {
       apply.approveUser = await this.apply.manager
         .getRepository(User)
         .findOneBy({ id: updateBody.approveUserId });
       delete updateBody.approveUserId;
       // 资产批准后同步到监控表
-      this.apply.manager.getRepository(Monitor).save({
+      await this.apply.manager.getRepository(Monitor).save({
         type: 2,
         applyUser: apply.user,
         handleUser: apply.approveUser,
         asset: apply.asset,
       });
     }
+    // 签收后移入我的资产
+    if (updateBody.status == 5) updateBody.myStatus = 1;
 
     return this.apply.update(id, {
       ...apply,

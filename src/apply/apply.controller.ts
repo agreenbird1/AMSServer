@@ -29,6 +29,11 @@ export class ApplyController {
     return this.applyService.findApprovalAll(query);
   }
 
+  @Get('my-asset')
+  findMyAssets(@Query() query) {
+    return this.applyService.findMyAssetsAll(query);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.applyService.findOne(+id);
