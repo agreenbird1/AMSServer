@@ -1,3 +1,4 @@
+import { Monitor } from './../monitor/entities/monitor.entity';
 import { Injectable } from '@nestjs/common';
 import { CreateApplyDto } from './dto/create-apply.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -87,11 +88,19 @@ export class ApplyService {
     const apply = await this.apply.findOneBy({ id });
     console.log('apply', apply);
     console.log('updateBody', updateBody);
+
     if (updateBody.approveUserId) {
       apply.approveUser = await this.apply.manager
         .getRepository(User)
         .findOneBy({ id: updateBody.approveUserId });
       delete updateBody.approveUserId;
+      // 资产批准后同步到监控表
+      this.apply.manager.getRepository(Monitor).save({
+        type: 2,
+        applyUser: apply.user,
+        handleUser: apply.approveUser,
+        asset: apply.asset,
+      });
     }
 
     return this.apply.update(id, {
