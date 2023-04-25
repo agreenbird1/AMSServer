@@ -40,8 +40,8 @@ export class User {
 
   @Column({
     type: 'enum',
-    enum: [1, 2, 3],
+    enum: [1, 2, 3, 4],
     default: 1,
   })
-  role: 1 | 2 | 3; // 1 成员 2 管理员 3 超级管理员
+  role: 1 | 2 | 3 | 4; // 1 成员 2 维修员 3管理员 4 超级管理员
 }
