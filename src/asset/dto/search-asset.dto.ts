@@ -8,6 +8,9 @@ export class SearchAssetDto {
   @IsOptional()
   categoryId: number;
 
+  @IsOptional()
+  isApply: boolean;
+
   pageNum: number;
   pageSize: number;
 }

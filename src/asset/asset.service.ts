@@ -23,6 +23,7 @@ export class AssetService {
       createAssetDto.picture ||
       'https://ydassetpicture.oss-cn-beijing.aliyuncs.com/pc-employee/app/dist/1681985422290/img/no-pic.2c7f0ca6.png';
     asset.quantity = createAssetDto.quantity;
+    asset.surplusQuantity = createAssetDto.quantity;
     asset.specification = createAssetDto.specification;
     asset.category = await this.categoryService.findOne(
       createAssetDto.categoryId,
@@ -37,6 +38,9 @@ export class AssetService {
 
     if (searchAssetDto.categoryId)
       qb = qb.andWhere('asset.categoryId = :categoryId', searchAssetDto);
+    // 剩余可用需要大于0且状态为启用
+    if (searchAssetDto.isApply)
+      qb = qb.andWhere('asset.status = 1 and asset.surplusQuantity > 0');
     qb = qb.andWhere(`asset.name like :name`, {
       name: '%' + searchAssetDto.name + '%',
     });

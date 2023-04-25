@@ -22,6 +22,9 @@ export class Asset {
   @Column({ type: 'int' })
   quantity: number;
 
+  @Column({ type: 'int' })
+  surplusQuantity: number;
+
   @CreateDateColumn()
   purchaseTime: Date;
 
@@ -46,10 +49,10 @@ export class Asset {
   serialNumber: string;
 
   @Column({ type: 'double' })
-  currentValue: number;
+  currentValue: number; // 当前资产总值
 
-  @Column({ type: 'double' })
-  depreciationValue: number;
+  @Column({ type: 'double', default: 0 })
+  depreciationValue: number; // 计算折旧后剩余总值
 
   @Column({ type: 'int', default: 0 })
   maintenanceNumber: number;
