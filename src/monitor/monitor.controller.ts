@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { MonitorService } from './monitor.service';
 import { CreateMonitorDto } from './dto/create-monitor.dto';
 import { UpdateMonitorDto } from './dto/update-monitor.dto';
@@ -13,8 +22,8 @@ export class MonitorController {
   }
 
   @Get()
-  findAll() {
-    return this.monitorService.findAll();
+  findAll(@Query() query) {
+    return this.monitorService.findAll(query);
   }
 
   @Get(':id')
