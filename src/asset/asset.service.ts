@@ -1,3 +1,4 @@
+import { Monitor } from './../monitor/entities/monitor.entity';
 import { Asset } from './entities/asset.entity';
 import { Injectable } from '@nestjs/common';
 import { CreateAssetDto } from './dto/create-asset.dto';
@@ -6,6 +7,7 @@ import { CategoryService } from 'src/category/category.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SearchAssetDto } from './dto/search-asset.dto';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class AssetService {
@@ -16,21 +18,30 @@ export class AssetService {
 
   async create(createAssetDto: CreateAssetDto) {
     const asset = new Asset();
-    asset.name = createAssetDto.name;
-    asset.amount = createAssetDto.amount;
-    asset.location = createAssetDto.location;
     asset.picture =
       createAssetDto.picture ||
       'https://ydassetpicture.oss-cn-beijing.aliyuncs.com/pc-employee/app/dist/1681985422290/img/no-pic.2c7f0ca6.png';
-    asset.quantity = createAssetDto.quantity;
     asset.surplusQuantity = createAssetDto.quantity;
-    asset.specification = createAssetDto.specification;
     asset.category = await this.categoryService.findOne(
       createAssetDto.categoryId,
     );
     asset.depreciationValue = asset.currentValue =
       asset.amount * asset.quantity;
-    return this.asset.manager.save(asset);
+    const handleUser = await this.asset.manager.getRepository(User).findOneBy({
+      id: createAssetDto.userId,
+    });
+    const newAsset = await this.asset.manager.save({
+      ...createAssetDto,
+      ...asset,
+    });
+    // 新增资产需要同步到监控表
+    this.asset.manager.getRepository(Monitor).save({
+      type: 1,
+      asset: newAsset,
+      applyUser: handleUser,
+      handleUser: handleUser,
+    });
+    return newAsset;
   }
 
   async findAll(searchAssetDto: SearchAssetDto) {
@@ -56,14 +67,14 @@ export class AssetService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} asset`;
+    return this.asset.findOneBy({ id });
   }
 
   update(id: number, updateAssetDto: UpdateAssetDto) {
-    return `This action updates a #${id} asset`;
+    return this.asset.update(id, updateAssetDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} asset`;
+    return this.asset.delete(id);
   }
 }

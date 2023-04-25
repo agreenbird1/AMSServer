@@ -7,6 +7,7 @@ export class CreateAssetDto {
   amount: number;
   categoryId: number;
   location: string;
+  userId: number;
 
   @IsOptional()
   picture: string;
