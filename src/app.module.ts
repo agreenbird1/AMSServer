@@ -7,6 +7,8 @@ import { AssetModule } from './asset/asset.module';
 import { CategoryModule } from './category/category.module';
 import { ApplyModule } from './apply/apply.module';
 import { AnnouncementModule } from './announcement/announcement.module';
+import { MaintenanceModule } from './maintenance/maintenance.module';
+import { MonitorModule } from './monitor/monitor.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { AnnouncementModule } from './announcement/announcement.module';
     CategoryModule,
     ApplyModule,
     AnnouncementModule,
+    MaintenanceModule,
+    MonitorModule,
   ],
   controllers: [AppController],
   providers: [AppService],
