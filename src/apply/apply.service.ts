@@ -135,7 +135,7 @@ export class ApplyService {
     // 退还移入监控表
     if (updateBody.myStatus == 3) {
       // 需要计算消耗的价值
-      this.apply.manager.getRepository(Asset).update(apply.asset.id, {
+      await this.apply.manager.getRepository(Asset).update(apply.asset.id, {
         depreciationValue:
           apply.asset.depreciationValue -
           CalConsumeValue(apply.applyTime, apply.asset.amount),
