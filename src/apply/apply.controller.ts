@@ -43,4 +43,9 @@ export class ApplyController {
   update(@Param('id') id: number, @Body() updateBody) {
     return this.applyService.update(id, updateBody);
   }
+
+  @Patch('/maintenance/:id')
+  maintenance(@Param('id') id: number, @Body() updateBody) {
+    return this.applyService.maintenance(id, updateBody);
+  }
 }

@@ -1,3 +1,4 @@
+import { Maintenance } from './../maintenance/entities/maintenance.entity';
 import { Monitor } from './../monitor/entities/monitor.entity';
 import { Injectable } from '@nestjs/common';
 import { CreateApplyDto } from './dto/create-apply.dto';
@@ -6,6 +7,7 @@ import { Asset } from 'src/asset/entities/asset.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Apply } from './entities/apply.entity';
+import CalConsumeValue from 'src/utils/CalConsumeValue';
 
 @Injectable()
 export class ApplyService {
@@ -26,7 +28,7 @@ export class ApplyService {
         .findOneBy({ id: assetId });
       // 申请这个物品后数量减一
       await this.apply.manager.getRepository(Asset).update(apply.asset.id, {
-        quantity: apply.asset.quantity - 1,
+        surplusQuantity: apply.asset.surplusQuantity - 1,
       });
       await this.apply.save(apply);
     }
@@ -130,10 +132,50 @@ export class ApplyService {
     }
     // 签收后移入我的资产
     if (updateBody.status == 5) updateBody.myStatus = 1;
+    // 退还移入监控表
+    if (updateBody.myStatus == 3) {
+      // 需要计算消耗的价值
+      this.apply.manager.getRepository(Asset).update(apply.asset.id, {
+        depreciationValue:
+          apply.asset.depreciationValue -
+          CalConsumeValue(apply.applyTime, apply.asset.amount),
+      });
+      await this.apply.manager.getRepository(Monitor).save({
+        type: 4,
+        applyUser: apply.user,
+        handleUser: apply.approveUser,
+        asset: apply.asset,
+      });
+    }
 
     return this.apply.update(id, {
       ...apply,
       ...updateBody,
     });
+  }
+
+  async maintenance(id: number, updateBody) {
+    const apply = await this.apply
+      .createQueryBuilder('apply')
+      .leftJoinAndSelect('apply.user', 'user')
+      .leftJoinAndSelect('apply.asset', 'asset')
+      .leftJoinAndSelect('apply.approveUser', 'approveUser')
+      .where('apply.id = :id', { id })
+      .getOne();
+    // 报修移入监控表
+    await this.apply.manager.getRepository(Monitor).save({
+      type: 3,
+      applyUser: apply.user,
+      handleUser: apply.approveUser,
+      asset: apply.asset,
+    });
+    // 报修移入维修表
+    await this.apply.manager.getRepository(Maintenance).save({
+      picture: updateBody.picture,
+      description: updateBody.description,
+      asset: apply.asset,
+      applyUser: apply.user,
+    });
+    return this.update(id, { myStatus: 2 });
   }
 }
