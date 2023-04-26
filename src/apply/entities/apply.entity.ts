@@ -22,10 +22,10 @@ export class Apply {
 
   @Column({
     type: 'enum',
-    enum: [1, 2, 3],
+    enum: [1, 2, 3, 4],
     nullable: true,
   })
-  myStatus: 1 | 2 | 3; // 正常使用、维修中、退还中
+  myStatus: 1 | 2 | 3 | 4; // 正常使用、维修中、退还中、已报废
 
   @CreateDateColumn()
   applyTime: Date;
