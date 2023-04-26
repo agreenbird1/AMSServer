@@ -34,11 +34,11 @@ export class MaintenanceService {
 
   async findAll(query) {
     let qb = this.maintenance.createQueryBuilder('maintenance');
+    qb = qb.where('maintenance.status = :status', query);
+    if (query.userId) {
+      qb = qb.andWhere('maintenance.maintenanceUser = :userId', query);
+    }
     qb = qb
-      .where(
-        'maintenance.applyUserId = :applyUserId and maintenance.status = :status',
-        query,
-      )
       .leftJoinAndSelect('maintenance.applyUser', 'applyUser')
       .leftJoinAndSelect('apply.asset', 'asset')
       .skip(10 * (query.pageNum - 1))
