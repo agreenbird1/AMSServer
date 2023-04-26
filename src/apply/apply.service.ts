@@ -7,7 +7,8 @@ import { Asset } from 'src/asset/entities/asset.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Apply } from './entities/apply.entity';
-import CalConsumeValue from 'src/utils/CalConsumeValue';
+import CalConsumeValue from '../utils/CalConsumeValue';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class ApplyService {
@@ -138,7 +139,7 @@ export class ApplyService {
       await this.apply.manager.getRepository(Asset).update(apply.asset.id, {
         depreciationValue:
           apply.asset.depreciationValue -
-          CalConsumeValue(apply.applyTime, apply.asset.amount),
+          CalConsumeValue(apply.signTime, apply.asset.amount),
       });
       await this.apply.manager.getRepository(Monitor).save({
         type: 4,
@@ -151,6 +152,7 @@ export class ApplyService {
     return this.apply.update(id, {
       ...apply,
       ...updateBody,
+      returnTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
     });
   }
 

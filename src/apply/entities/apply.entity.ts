@@ -37,6 +37,9 @@ export class Apply {
   signTime: string;
 
   @Column({ nullable: true })
+  returnTime: string;
+
+  @Column({ nullable: true })
   rejectReason: string;
 
   @Column({ nullable: true })
