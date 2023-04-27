@@ -1,3 +1,4 @@
+import { Maintenance } from './../../maintenance/entities/maintenance.entity';
 import { Asset } from 'src/asset/entities/asset.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
@@ -27,6 +28,9 @@ export class Monitor {
 
   @ManyToOne(() => Asset)
   asset: Asset;
+
+  @ManyToOne(() => Maintenance)
+  maintenance: Maintenance;
 
   @CreateDateColumn()
   createTime: Date;
