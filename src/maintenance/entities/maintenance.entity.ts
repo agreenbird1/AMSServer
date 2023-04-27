@@ -1,3 +1,4 @@
+import { Apply } from 'src/apply/entities/apply.entity';
 import { Asset } from 'src/asset/entities/asset.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
@@ -34,6 +35,9 @@ export class Maintenance {
 
   @ManyToOne(() => User)
   applyUser: User;
+
+  @ManyToOne(() => Apply)
+  apply: Apply;
 
   @ManyToOne(() => User)
   maintenanceUser: User;
