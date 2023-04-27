@@ -35,6 +35,7 @@ export class AssetService {
     const handleUser = await this.asset.manager.getRepository(User).findOneBy({
       id: createAssetDto.userId,
     });
+    asset.addUser = handleUser;
     const newAsset = await this.asset.manager.save(asset);
     // 新增资产需要同步到监控表
     this.asset.manager.getRepository(Monitor).save({

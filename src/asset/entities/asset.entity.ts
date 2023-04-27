@@ -1,3 +1,4 @@
+import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
   Column,
@@ -68,4 +69,7 @@ export class Asset {
 
   @ManyToOne(() => Category)
   category: Category;
+
+  @ManyToOne(() => User)
+  addUser: User; // 添加人
 }
