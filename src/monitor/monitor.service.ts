@@ -20,6 +20,7 @@ export class MonitorService {
     // leftJoinAndSelect会判断是否选择当前的实体
     const qb = this.monitor
       .createQueryBuilder('monitor')
+      .leftJoinAndSelect('monitor.maintenance', 'maintenance')
       .innerJoinAndSelect(
         'monitor.applyUser',
         'applyUser',
@@ -44,6 +45,7 @@ export class MonitorService {
           assetName: '%' + query.assetName + '%',
         },
       )
+      .leftJoinAndSelect('asset.category', 'category')
       .skip(10 * (query.pageNum - 1))
       .take(10);
 
