@@ -164,19 +164,23 @@ export class ApplyService {
       .leftJoinAndSelect('apply.approveUser', 'approveUser')
       .where('apply.id = :id', { id })
       .getOne();
+    // 报修移入维修表
+    const maintenance = await this.apply.manager
+      .getRepository(Maintenance)
+      .save({
+        picture: updateBody.picture,
+        description: updateBody.description,
+        asset: apply.asset,
+        applyUser: apply.user,
+        apply: apply,
+      });
     // 报修移入监控表
     await this.apply.manager.getRepository(Monitor).save({
       type: 3,
       applyUser: apply.user,
       handleUser: apply.approveUser,
       asset: apply.asset,
-    });
-    // 报修移入维修表
-    await this.apply.manager.getRepository(Maintenance).save({
-      picture: updateBody.picture,
-      description: updateBody.description,
-      asset: apply.asset,
-      applyUser: apply.user,
+      maintenance,
     });
     return this.update(id, { myStatus: 2 });
   }

@@ -1,9 +1,10 @@
+import { Apply } from './../apply/entities/apply.entity';
+import { Monitor } from './../monitor/entities/monitor.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Asset } from 'src/asset/entities/asset.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { CreateMaintenanceDto } from './dto/create-maintenance.dto';
-import { UpdateMaintenanceDto } from './dto/update-maintenance.dto';
 import { Maintenance } from './entities/maintenance.entity';
 import { Repository } from 'typeorm';
 
@@ -17,12 +18,12 @@ export class MaintenanceService {
   async create(createMaintenanceDto: CreateMaintenanceDto) {
     const maintenance = new Maintenance();
     maintenance.asset = await this.maintenance.manager
-      .getMongoRepository(Asset)
+      .getRepository(Asset)
       .findOneBy({
         id: createMaintenanceDto.assetId,
       });
     maintenance.applyUser = await this.maintenance.manager
-      .getMongoRepository(User)
+      .getRepository(User)
       .findOneBy({
         id: createMaintenanceDto.applyUserId,
       });
@@ -40,7 +41,8 @@ export class MaintenanceService {
     }
     qb = qb
       .leftJoinAndSelect('maintenance.applyUser', 'applyUser')
-      .leftJoinAndSelect('apply.asset', 'asset')
+      .leftJoinAndSelect('maintenance.asset', 'asset')
+      .leftJoinAndSelect('maintenance.apply', 'apply')
       .skip(10 * (query.pageNum - 1))
       .take(10);
 
@@ -56,14 +58,43 @@ export class MaintenanceService {
     return `This action returns a #${id} maintenance`;
   }
 
-  async update(id: number, updateMaintenanceDto: UpdateMaintenanceDto) {
-    const maintenance = new Maintenance();
-    maintenance.maintenanceUser = await this.maintenance.manager
-      .getMongoRepository(User)
-      .findOneBy({
-        id: updateMaintenanceDto.maintenanceUserId,
+  async update(id: number, updateMaintenanceDto) {
+    console.log('updateMaintenanceDto', updateMaintenanceDto);
+    const maintenance = await this.maintenance
+      .createQueryBuilder('maintenance')
+      .leftJoinAndSelect('maintenance.apply', 'apply')
+      .where('maintenance.id = :id', { id })
+      .getOne();
+    const { status, maintenanceValue, maintenanceUserId, assetId } =
+      updateMaintenanceDto;
+    const user = await this.maintenance.manager.getRepository(User).findOneBy({
+      id: maintenanceUserId,
+    });
+    const assetRepository = this.maintenance.manager.getRepository(Asset);
+    const asset = await assetRepository.findBy({ id: assetId });
+    if (status == 0) {
+      // 报废
+      this.maintenance.manager.getRepository(Monitor).save({
+        type: 5,
+        handleUser: user,
+        applyUser: user,
+        asset: asset[0],
       });
-    // pending 资产内容变更
-    return `This action updates a #${id} maintenance`;
+      this.maintenance.manager.getRepository(Apply).save({
+        id: maintenance.apply.id,
+        myStatus: 4,
+      });
+    } else {
+      asset[0].depreciationValue -= maintenanceValue;
+      assetRepository.save(asset[0]);
+      // 维修完成的重置我的资产
+      this.maintenance.manager.getRepository(Apply).save({
+        id: maintenance.apply.id,
+        myStatus: 1,
+      });
+    }
+    maintenance.maintenanceUser = user;
+    maintenance.status = 1;
+    return this.maintenance.save(maintenance);
   }
 }
