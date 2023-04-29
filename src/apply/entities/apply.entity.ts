@@ -37,6 +37,12 @@ export class Apply {
   signTime: string;
 
   @Column({ nullable: true })
+  maintenanceTime: string;
+
+  @Column({ nullable: true })
+  scrapTime: string;
+
+  @Column({ nullable: true })
   returnTime: string;
 
   @Column({ nullable: true })
