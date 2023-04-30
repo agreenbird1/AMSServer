@@ -7,6 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateMaintenanceDto } from './dto/create-maintenance.dto';
 import { Maintenance } from './entities/maintenance.entity';
 import { Repository } from 'typeorm';
+import getTime from 'src/utils/getTime';
 
 @Injectable()
 export class MaintenanceService {
@@ -83,15 +84,22 @@ export class MaintenanceService {
       this.maintenance.manager.getRepository(Apply).save({
         id: maintenance.apply.id,
         myStatus: 4,
+        scrapTime: getTime(),
       });
+      asset[0].scrapValue += asset[0].amount;
+      asset[0].scrapNumber += 1;
+      assetRepository.save(asset[0]);
     } else {
       asset[0].depreciationValue -= maintenanceValue;
-      assetRepository.save(asset[0]);
       // 维修完成的重置我的资产
       this.maintenance.manager.getRepository(Apply).save({
         id: maintenance.apply.id,
         myStatus: 1,
+        maintenanceTime: getTime(),
       });
+      asset[0].maintenanceValue += maintenanceValue;
+      asset[0].maintenanceNumber += 1;
+      assetRepository.save(asset[0]);
     }
     maintenance.maintenanceUser = user;
     maintenance.status = 1;
