@@ -146,6 +146,7 @@ export class ApplyService {
         applyUser: apply.user,
         handleUser: apply.approveUser,
         asset: apply.asset,
+        useTime: dayjs(dayjs(new Date())).diff(apply.signTime, 'days'),
       });
     }
 

@@ -23,6 +23,9 @@ export class Monitor {
   @ManyToOne(() => User)
   applyUser: User;
 
+  @Column({ nullable: true })
+  useTime: number;
+
   @ManyToOne(() => User)
   handleUser: User;
 
