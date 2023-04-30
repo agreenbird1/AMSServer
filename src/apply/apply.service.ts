@@ -130,6 +130,9 @@ export class ApplyService {
         handleUser: apply.approveUser,
         asset: apply.asset,
       });
+      this.apply.manager.getRepository(Asset).update(apply.asset.id, {
+        useTimes: apply.asset.useTimes + 1,
+      });
     }
     // 签收后移入我的资产
     if (updateBody.status == 5) updateBody.myStatus = 1;

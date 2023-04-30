@@ -56,6 +56,9 @@ export class Asset {
   depreciationValue: number; // 计算折旧后剩余总值
 
   @Column({ type: 'int', default: 0 })
+  useTimes: number;
+
+  @Column({ type: 'int', default: 0 })
   maintenanceNumber: number;
 
   @Column({ type: 'double', default: 0 })
