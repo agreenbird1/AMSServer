@@ -140,6 +140,8 @@ export class ApplyService {
         depreciationValue:
           apply.asset.depreciationValue -
           CalConsumeValue(apply.signTime, apply.asset.amount),
+        // 退还后可用数量需增加
+        surplusQuantity: apply.asset.surplusQuantity + 1,
       });
       await this.apply.manager.getRepository(Monitor).save({
         type: 4,
