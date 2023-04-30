@@ -81,11 +81,13 @@ export class MaintenanceService {
         applyUser: user,
         asset: asset[0],
       });
-      this.maintenance.manager.getRepository(Apply).save({
-        id: maintenance.apply.id,
-        myStatus: 4,
-        scrapTime: getTime(),
-      });
+      this.maintenance.manager
+        .getRepository(Apply)
+        .update(maintenance.apply.id, {
+          myStatus: 4,
+          scrapTime: getTime(),
+          approveUser: user,
+        });
       asset[0].scrapValue += asset[0].amount;
       asset[0].scrapNumber += 1;
       assetRepository.save(asset[0]);
