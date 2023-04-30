@@ -46,6 +46,7 @@ export class MonitorService {
         },
       )
       .leftJoinAndSelect('asset.category', 'category')
+      .orderBy('monitor.createTime', 'DESC')
       .skip(10 * (query.pageNum - 1))
       .take(10);
 
