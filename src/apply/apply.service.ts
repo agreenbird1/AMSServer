@@ -130,12 +130,14 @@ export class ApplyService {
         handleUser: apply.approveUser,
         asset: apply.asset,
       });
+    }
+    // 签收后移入我的资产
+    if (updateBody.status == 5) {
+      updateBody.myStatus = 1;
       this.apply.manager.getRepository(Asset).update(apply.asset.id, {
         useTimes: apply.asset.useTimes + 1,
       });
     }
-    // 签收后移入我的资产
-    if (updateBody.status == 5) updateBody.myStatus = 1;
     // 退还移入监控表
     if (updateBody.myStatus == 3) {
       // 需要计算消耗的价值
