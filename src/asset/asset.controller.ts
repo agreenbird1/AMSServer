@@ -10,7 +10,6 @@ import {
 import { AssetService } from './asset.service';
 import { CreateAssetDto } from './dto/create-asset.dto';
 import { UpdateAssetDto } from './dto/update-asset.dto';
-import { SearchAssetDto } from './dto/search-asset.dto';
 
 @Controller('asset')
 export class AssetController {
@@ -19,6 +18,11 @@ export class AssetController {
   @Post()
   create(@Body() createAssetDto: CreateAssetDto) {
     return this.assetService.create(createAssetDto);
+  }
+
+  @Post('update/:id')
+  updateAsset(@Param('id') id: string, @Body() updateAssetDto) {
+    return this.assetService.updateAsset(id, updateAssetDto);
   }
 
   @Post('list')

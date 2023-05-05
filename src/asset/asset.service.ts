@@ -60,6 +60,7 @@ export class AssetService {
     });
 
     qb = qb
+      .leftJoinAndSelect('asset.category', 'category')
       .skip(searchAssetDto.pageSize * (searchAssetDto.pageNum - 1))
       .take(searchAssetDto.pageSize);
     const data = await qb.getManyAndCount();
@@ -74,6 +75,14 @@ export class AssetService {
   }
 
   update(id: number, updateAssetDto: UpdateAssetDto) {
+    return this.asset.update(id, updateAssetDto);
+  }
+
+  async updateAsset(id: string, updateAssetDto) {
+    updateAssetDto.category = await this.categoryService.findOne(
+      updateAssetDto.categoryId,
+    );
+    delete updateAssetDto.categoryId;
     return this.asset.update(id, updateAssetDto);
   }
 
