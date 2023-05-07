@@ -19,4 +19,8 @@ export class AnnouncementService {
     const announcements = await this.announcement.find();
     return announcements.at(-1) || {};
   }
+
+  clear() {
+    return this.announcement.clear();
+  }
 }
