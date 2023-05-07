@@ -14,7 +14,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-
+    console.log('exception', exception);
     // 非 HTTP 标准异常的处理。
     response.status(HttpStatus.SERVICE_UNAVAILABLE).send({
       timestamp: new Date().toISOString(),
