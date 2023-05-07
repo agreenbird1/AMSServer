@@ -48,6 +48,7 @@ export class UserService {
     );
 
     qb = qb
+      .leftJoinAndSelect('user.category', 'category')
       .skip(searchUserDto.pageSize * (searchUserDto.pageNum - 1))
       .take(searchUserDto.pageSize);
     const data = await qb.getManyAndCount();
@@ -61,7 +62,11 @@ export class UserService {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    updateUserDto.category = await this.categoryService.findOne(
+      updateUserDto.categoryId,
+    );
+    delete updateUserDto.categoryId;
     return this.user.update(id, updateUserDto);
   }
 
