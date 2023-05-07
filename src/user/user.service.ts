@@ -17,6 +17,9 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
+    const checkUser = await this.user.findOneBy({ phone: createUserDto.phone });
+    // 手机号重复校验
+    if (checkUser) throw new BusinessException('手机号重复！');
     const user = new User();
     user.userName = createUserDto.userName;
     user.description = createUserDto.description || '';
