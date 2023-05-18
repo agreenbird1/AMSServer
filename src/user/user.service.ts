@@ -104,7 +104,8 @@ export class UserService {
     return this.update(body.id, { role: body.role });
   }
 
-  checkRepeatAccount(body: { phone: string }) {
-    return !!this.user.findOneBy(body);
+  async checkRepeatAccount(body: { phone: string }) {
+    const user = await this.user.findOneBy(body);
+    return !!user;
   }
 }

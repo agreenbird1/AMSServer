@@ -83,6 +83,9 @@ export class AssetService {
       updateAssetDto.categoryId,
     );
     delete updateAssetDto.categoryId;
+    if (!updateAssetDto.picture)
+      updateAssetDto.picture =
+        'https://ydassetpicture.oss-cn-beijing.aliyuncs.com/pc-employee/app/dist/1681985422290/img/no-pic.2c7f0ca6.png';
     return this.asset.update(id, updateAssetDto);
   }
 
