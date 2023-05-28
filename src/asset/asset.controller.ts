@@ -10,14 +10,21 @@ import {
 import { AssetService } from './asset.service';
 import { CreateAssetDto } from './dto/create-asset.dto';
 import { UpdateAssetDto } from './dto/update-asset.dto';
+import { LockService } from 'src/common/services/lock.service';
 
 @Controller('asset')
 export class AssetController {
-  constructor(private readonly assetService: AssetService) {}
+  constructor(
+    private readonly lockService: LockService,
+    private readonly assetService: AssetService,
+  ) {}
 
   @Post()
-  create(@Body() createAssetDto: CreateAssetDto) {
-    return this.assetService.create(createAssetDto);
+  async create(@Body() createAssetDto: CreateAssetDto) {
+    await this.lockService.acquireLock();
+    const res = await this.assetService.create(createAssetDto);
+    this.lockService.releaseLock();
+    return res;
   }
 
   @Post('update/:id')
