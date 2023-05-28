@@ -16,11 +16,12 @@ export class MonitorService {
   }
 
   async findAll(query) {
-    let { pageSize } = query;
+    // eslint-disable-next-line prefer-const
+    let { pageSize, type } = query;
     pageSize = pageSize ? pageSize : 10;
     // innerJoinAndSelect会与连接,是是否返回整个实体
     // leftJoinAndSelect会判断是否选择当前的实体
-    const qb = this.monitor
+    let qb = this.monitor
       .createQueryBuilder('monitor')
       .leftJoinAndSelect('monitor.maintenance', 'maintenance')
       .innerJoinAndSelect(
@@ -47,8 +48,12 @@ export class MonitorService {
           assetName: '%' + query.assetName + '%',
         },
       )
-      .leftJoinAndSelect('asset.category', 'category')
-      .orderBy('monitor.createTime', 'DESC')
+      .leftJoinAndSelect('asset.category', 'category');
+    if (type)
+      qb = qb.andWhere('monitor.type = :type', {
+        type,
+      });
+    qb.orderBy('monitor.createTime', 'DESC')
       .skip(pageSize * (query.pageNum - 1))
       .take(pageSize);
 
