@@ -16,6 +16,8 @@ export class MonitorService {
   }
 
   async findAll(query) {
+    let { pageSize } = query;
+    pageSize = pageSize ? pageSize : 10;
     // innerJoinAndSelect会与连接,是是否返回整个实体
     // leftJoinAndSelect会判断是否选择当前的实体
     const qb = this.monitor
@@ -47,8 +49,8 @@ export class MonitorService {
       )
       .leftJoinAndSelect('asset.category', 'category')
       .orderBy('monitor.createTime', 'DESC')
-      .skip(10 * (query.pageNum - 1))
-      .take(10);
+      .skip(pageSize * (query.pageNum - 1))
+      .take(pageSize);
 
     const data = await qb.getManyAndCount();
     return {
